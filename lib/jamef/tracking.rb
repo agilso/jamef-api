@@ -1,0 +1,2 @@
+module Jamef::Tracking
+end
