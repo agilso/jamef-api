@@ -4,13 +4,13 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require "jamef/version"
 
 Gem::Specification.new do |spec|
-  spec.name          = "jamef_api"
+  spec.name          = "jamef-api"
   spec.version       = Jamef::VERSION
   spec.authors       = ["Agilso"]
   spec.email         = ["agilso.b@gmail.com"]
 
   spec.summary       = %q{Jamef REST API v1}
-  spec.description   = %q{Ruby wrapper for the Jamef.com.br Rest API.}
+  spec.description   = %q{Ruby wrapper for the Jamef.com.br Rest API (v1).}
   spec.homepage      = "https://github.com/agilso/jamef-api"
   spec.license       = "MIT"
 
@@ -34,6 +34,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rake", "~> 10.0"
   spec.add_development_dependency "rspec", "~> 3.0"
   spec.add_development_dependency "guard-rspec"
+  spec.add_development_dependency "pry"
   
   spec.add_dependency "activesupport", "~> 5.2.0"
   spec.add_dependency "activemodel", "~> 5.2.0"

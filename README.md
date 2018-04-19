@@ -21,10 +21,10 @@ São apenas 3 passos para realizar uma consulta.
 
 ```ruby
 my_company = Jamef::Client.new({
-  cnpj: 'xxx',
+  document: 'xxx',
   user: 'xxx',
   city: 'Jundiaí', 
-  uf: 'SP', 
+  state: 'SP', 
   jamef_branch: :campinas
 })
 ```                           
