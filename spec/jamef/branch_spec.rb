@@ -5,7 +5,7 @@ RSpec.describe Jamef::Branch do
   context 'class' do
     
     context 'all method' do
-      it 'returns an array containg all branches' do
+      it 'returns an array containing all branches' do
         expect(Jamef::Branch.all).to be_an Array
         expect(Jamef::Branch.all).not_to be_empty
       end
