@@ -7,9 +7,19 @@ require 'jamef/rating'
 require 'jamef/tracking'
 
 module Jamef
+  
+  API_VERSION = 'v1'
 
-  def self.consult params
-    Jamef::Rating.consult(params)
+  def self.rate params
+    Jamef::Rating.rate(params)
+  end
+  
+  def self.track params
+    Jamef::Tracking.track(params)
+  end
+  
+  def self.api_base_url
+    "http://www.jamef.com.br/frete/rest/#{API_VERSION}/"
   end
 
 end

@@ -1,6 +1,6 @@
 # Jamef REST API (v1)
 
-Olá. Essa gem é um Ruby wrapper da API REST (v1) da *Jamef.com.br*. Use-a em qualquer projeto Ruby ou Ruby on Rails.
+Olá. Essa gem é um Ruby wrapper da API REST (v1) da *Jamef.com.br*. Use-a em qualquer projeto Ruby/Rails.
 
 Você poderá facilmente
 
@@ -13,7 +13,7 @@ Você poderá facilmente
 
 Vamos aprender a **consultar valor e prazo**  e também **rastrear uma encomenda**.
 
-### Consulta
+### Consulta de frete (Rating)
 
 São apenas 3 passos para realizar uma consulta.
 
@@ -21,11 +21,11 @@ São apenas 3 passos para realizar uma consulta.
 
 ```ruby
 my_company = Jamef::Client.new({
-  document: 'xxx',
-  user: 'xxx',
-  city: 'Jundiaí', 
-  state: 'SP', 
-  jamef_branch: :campinas
+  document: 'xxx',          # cpf ou cnpj
+  user: 'xxx',              # usuario jamef
+  city: 'Jundiaí',          # sua cidade
+  state: 'SP',              # seu estado
+  jamef_branch: :campinas   # sua filial da jamef
 })
 ```                           
 
@@ -40,10 +40,10 @@ my_company = Jamef::Client.new({
 
 ```ruby
 package = Jamef::Package.new({
-  weight: 5, #kg
-  package_price: 1000, # R$
-  volume: 5, #m³
-  type: :nf # opcional - leia mais abaixo
+  weight: 5,            # kg - peso da encomenda
+  package_price: 1000,  # R$ - valor da encomenda
+  volume: 5,            # m³ - vol. total cubado
+  type: :nf             # opcional (leia abaixo)
 }) 
 ```
 
@@ -56,7 +56,7 @@ Você pode omitir `type: :nf` que é o valor padrão. O tipo `:nf` diz à Jamef 
 **3)** Realize a consulta.
 
 ```ruby
-Jamef.consult({
+Jamef.rate({
   client: my_company, 
   package: package, 
   to: 'CEP DESTINO', 
@@ -71,7 +71,7 @@ E é isso. ;)
 
 ---
 
-### Rastreando
+### Rastreio (Tracking)
 
 Ainda não está pronto.
 
