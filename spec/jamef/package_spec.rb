@@ -28,4 +28,11 @@ RSpec.describe Jamef::Package do
       Jamef::Package.new hash.merge(type: :unknown_chuck_norris_type)
     }.to raise_error ArgumentError
   end
+  
+  context 'class' do
+    it 'has a map of package types' do
+      expect(Jamef::Package.type_map(:nf)).to eq '000004'
+      expect(Jamef::Package.type_map(:alimentos)).to eq '000010'
+    end
+  end
 end

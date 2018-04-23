@@ -29,6 +29,13 @@ RSpec.describe Jamef::Rating do
     { client: client, package: package, to: '07060-000', shipping_in: 3.days.from_now, service_type: :road }
   }
   
+  context 'service map' do
+    it 'returns correctly' do
+      expect(Jamef::Rating.service_map(:road)).to eq 1
+      expect(Jamef::Rating.service_map(:air)).to eq 2
+    end
+  end
+  
   context 'param validation' do
     
     fit 'valid_params "factory" is valid' do

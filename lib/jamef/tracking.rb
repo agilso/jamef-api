@@ -1,2 +1,4 @@
-module Jamef::Tracking
+module Jamef
+  module Rating
+  end
 end

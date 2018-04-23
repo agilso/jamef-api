@@ -59,8 +59,16 @@ Você pode omitir `type: :nf` que é o valor padrão. O tipo `:nf` diz à Jamef 
 Jamef.rate({
   client: my_company, 
   package: package, 
-  to: 'CEP DESTINO', 
-  shipping_in: 3.days.from_now # data de coleta
+  
+  # CEP
+  to: 'xxxxx-xxx',
+   
+  # Tipo de transporte: Aéreo (:air) ou rodoviário (:road)
+  service_type: :road,
+  
+  # data de coleta
+  shipping_in: 3.days.from_now
+  
 })
 # => {price: 50.00, estimated_delivery_date: date }
 ```
@@ -82,7 +90,7 @@ Ainda não está pronto.
 Se você estiver usando o Bundler, adiciona esta linha no seu Gemfile
 
 ```ruby
-gem 'jamef-api'
+gem 'jamef-api', require: 'jamef'
 ```
 
 E execute
@@ -99,7 +107,7 @@ Neste caso, quando for utilizar, não esqueça de dar um
 require 'jamef-api'
 ```
     
-antes.
+em cima do documento antes utilizar a Gem.
 
 ## Informações Complementares - Jamef
 

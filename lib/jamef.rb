@@ -5,6 +5,7 @@ require "jamef/package"
 require "jamef/client"
 require 'jamef/rating'
 require 'jamef/tracking'
+require 'jamef/helper'
 
 module Jamef
   
