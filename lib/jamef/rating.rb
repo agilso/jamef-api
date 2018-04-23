@@ -64,7 +64,7 @@ module Jamef
     end
     
     def self.successful_response? parsed_response
-      parsed_response[:freight][:msgerro].match?(/^OK/i) and  parsed_response[:delivery][:msgerro].match?(/^OK/i)
+      parsed_response[:freight][:msgerro].match?(/^ok/i) and  parsed_response[:delivery][:msgerro].match?(/^ok/i)
     end
     
     

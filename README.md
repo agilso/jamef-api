@@ -11,12 +11,12 @@ Você poderá facilmente
 
 ## 1. Consultando o Frete (Rating)
 
-Realizar uma consulta de frete e prazo é bastante simples. São apenas 4 passos. Visão simplificada do processo:
+Realizar uma consulta de frete e prazo é bastante simples. São apenas 4 passos, veja uma resumo do processo:
 
 1. Defina o **remetente** com `Jamef::Sender`
-2. Defina o **destinário** com `Jamef::Receiver`
+2. Defina o **destinatário** com `Jamef::Receiver`
 3. Defina **a mercadoria que vai ser enviada** com `Jamef::Package`
-4. Realize a **consulta** com `Jamef.rate`
+4. Realize a **consulta** com `Jamef.quick_rate` ou `Jamef.rate`
 
 
 
@@ -74,7 +74,7 @@ Há dois métodos que você pode usar para fazer a consulta: `Jamef.rate` e `Jam
 
 Você pode realizar uma consulta simples com o `Jamef::quick_rate`
 
-Em `shipping_in`, informe a data de coleta da encomenda.
+Em `shipping_in`, informe a data/horário (datetime) de coleta da encomenda.
 
 ```ruby
 Jamef.quick_rate({
@@ -85,7 +85,7 @@ Jamef.quick_rate({
   # Tipo de transporte: Aéreo (:air) ou rodoviário (:road)
   service_type: :road,
   
-  # data/hora de coleta (Datetime obj)
+  # data/hora de coleta (Datetime obj.)
   shipping_in: 3.days.from_now.midday
   
 })

@@ -70,7 +70,7 @@ module Jamef
     end
     
     def self.parse_date value
-      Date.strptime(value, '%d/%m/%Y')
+      Date.strptime(value, '%d/%m/%y')
     end
     
     def self.parse_decimal value
