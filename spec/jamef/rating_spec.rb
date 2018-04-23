@@ -8,9 +8,8 @@ fake_response = OpenStruct.new(body: {"valor": "50.00","previsao_entrega":"31/12
 RSpec.describe Jamef::Rating do
   
   let(:client) {
-    Jamef::Client.new({
+    Jamef::Sender.new({
       document: '000.000.000-00',
-      user: 'test_user',
       city: 'Test City',
       state: 'XX',
       jamef_branch: :campinas
@@ -28,76 +27,42 @@ RSpec.describe Jamef::Rating do
   let(:valid_params) {
     { client: client, package: package, to: '07060-000', shipping_in: 3.days.from_now, service_type: :road }
   }
+  # 
+  # context 'service map' do
+  # 
+  # end
+
   
-  context 'service map' do
-    it 'returns correctly' do
-      expect(Jamef::Rating.service_map(:road)).to eq 1
-      expect(Jamef::Rating.service_map(:air)).to eq 2
-    end
-  end
-  
-  context 'param validation' do
+  # context 'soap' do
+  #   before(:each) {
+  #     allow(Jamef::Rating).to receive(:build_url_from_params).and_return(fake_url)
+  # 
+  #     allow(RestClient).to receive(:get).with(fake_url).and_return(fake_response)
+  #   }
+  # 
+  # 
+  #   it 'url is stubbed correctly' do
+  #     expect(Jamef::Rating.build_url_from_params('lol')).to eq 'http://testing.jamef.request'
+  #   end
+  # 
+  #   context 'rate' do
+  #     it 'makes a http request to the jamef api' do
+  #       expect(RestClient).to receive(:get).with(fake_url)
+  #       Jamef::Rating.rate(valid_params)
+  #     end
+  # 
+  #     context 'success' do
+  #       it 'returns a hash' do
+  #         expect(Jamef::Rating.rate(valid_params)).to eq( {price: 50.00, estimated_delivery_date: Date.today.end_of_year })
+  #       end
+  #     end
+  # 
+  #     context 'parsing' do
+  # 
+  #     end
+  # 
+  #   end
     
-    fit 'valid_params "factory" is valid' do
-      expect(Jamef::Rating.validate_params(valid_params)).to be_truthy
-    end
-    
-    it 'params must be a hash' do
-      expect {
-        Jamef::Rating.validate_params
-      }.to raise_error ArgumentError
-      
-      expect {
-        Jamef::Rating.validate_params 1
-      }.to raise_error ArgumentError
-      
-      expect {
-        Jamef::Rating.validate_params 'lol'
-      }.to raise_error ArgumentError
-      
-    end
-      
-    [:client,:package,:to,:shipping_in].each do |field|
-      it "raises without #{field}" do
-        expect{
-          valid_params[field] = nil
-          Jamef::Rating.validate_params(valid_params)
-        }.to raise_error ArgumentError
-      end
-    end
-    
-  end
-  
-  context 'api requests' do
-      before(:each) {
-        allow(Jamef::Rating).to receive(:build_url_from_params).and_return(fake_url)
-        
-        allow(RestClient).to receive(:get).with(fake_url).and_return(fake_response)
-      }
-      
-      
-    it 'url is stubbed correctly' do
-      expect(Jamef::Rating.build_url_from_params('lol')).to eq 'http://testing.jamef.request'
-    end
-    
-    context 'rate' do
-      it 'makes a http request to the jamef api' do
-        expect(RestClient).to receive(:get).with(fake_url)
-        Jamef::Rating.rate(valid_params)
-      end
-      
-      context 'success' do
-        it 'returns a hash' do
-          expect(Jamef::Rating.rate(valid_params)).to eq( {price: 50.00, estimated_delivery_date: Date.today.end_of_year })
-        end
-      end
-      
-      context 'parsing' do
-        
-      end
-      
-    end
-    
-  end
+  # end
   
 end

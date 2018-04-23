@@ -9,20 +9,24 @@ Você poderá facilmente
 
 **( ! )** Neste momento, somente a consulta está disponível. A funcionalidade do rastreio (tracking) não deve demorar para ser implementada. Colaborações são bem-vindas, mande o pull-request. ;)
 
-## Guia de utilização
+## 1. Consultando o Frete (Rating)
 
-Vamos aprender a **consultar valor e prazo**  e também **rastrear uma encomenda**.
+Realizar uma consulta de frete e prazo é bastante simples. São apenas 4 passos. Visão simplificada do processo:
 
-### Consulta de frete (Rating)
+1. Defina o **remetente** com `Jamef::Sender`
+2. Defina o **destinário** com `Jamef::Receiver`
+3. Defina **a mercadoria que vai ser enviada** com `Jamef::Package`
+4. Realize a **consulta** com `Jamef.rate`
 
-São apenas 3 passos para realizar uma consulta.
 
-**1)** Inicialize um objeto `Jamef::Client` com as informações da sua empresa.
+
+### 1.1 - Remetente
+
+Inicialize um objeto `Jamef::Sender` com as informações da sua empresa.
 
 ```ruby
-my_company = Jamef::Client.new({
-  document: 'xxx',          # cpf ou cnpj
-  user: 'xxx',              # usuario jamef
+my_company = Jamef::Sender.new({
+  document: 'xxx',          # cnpj/cpf
   city: 'Jundiaí',          # sua cidade
   state: 'SP',              # seu estado
   jamef_branch: :campinas   # sua filial da jamef
@@ -31,18 +35,29 @@ my_company = Jamef::Client.new({
 
 **Importante:**
 
-* O valor do `user` é nome do seu usuário no portal da http://jamef.com.br 
 * `jamef_branch` é sempre o nome da cidade da filial da Jamef associada à sua conta. Veja a tabela no final do documento.
 
----
+### 1.2 - Destinário
 
-**2)** Crie um pacote informando o volume final cubado (**m³**) e também seu peso (**kg**) com o `Jamef::Package`.
+Crie um destinatário com o `Jamef::Receiver`.
+
+```ruby
+receiver = Jamef::Receiver.new({
+  zip: 'CEP AQUI',         # obrigatório: CEP
+  document: 'CNPJ AQUI',   # opcional: cpf/cnpj do destinatário
+  contrib: true            # opcional: Dest. é contribuinte?
+}) 
+```
+
+### 1.3 - Mercadoria
+
+Faça um pacote informando o volume final cubado (**m³**) e também seu peso (**kg**) com o `Jamef::Package`.
 
 ```ruby
 package = Jamef::Package.new({
   weight: 5,            # kg - peso da encomenda
   package_price: 1000,  # R$ - valor da encomenda
-  volume: 5,            # m³ - vol. total cubado
+  volume: 2,            # m³ - vol. total cubado
   type: :nf             # opcional (leia abaixo)
 }) 
 ```
@@ -51,41 +66,59 @@ Este último parâmetro `type` está relacionado com o tipo de produto que será
 
 Você pode omitir `type: :nf` que é o valor padrão. O tipo `:nf` diz à Jamef para inferir o tipo de produto a partir da nota fiscal. Veja a tabela no final do documento para preencher o campo `type` adequadamente.
 
----
+### 1.4 - Consulta
 
-**3)** Realize a consulta.
+Há dois métodos que você pode usar para fazer a consulta: `Jamef.rate` e `Jamef.quick_rate`. Escolha a maneira mais adequada.
+
+#### 1.4.1 Consulta com retorno simplificado
+
+Você pode realizar uma consulta simples com o `Jamef::quick_rate`
+
+Em `shipping_in`, informe a data de coleta da encomenda.
 
 ```ruby
-Jamef.rate({
-  client: my_company, 
+Jamef.quick_rate({
+  sender: my_company, 
+  receiver: receiver, 
   package: package, 
-  
-  # CEP
-  to: 'xxxxx-xxx',
    
   # Tipo de transporte: Aéreo (:air) ou rodoviário (:road)
   service_type: :road,
   
-  # data de coleta
-  shipping_in: 3.days.from_now
+  # data/hora de coleta (Datetime obj)
+  shipping_in: 3.days.from_now.midday
   
 })
-# => {price: 50.00, estimated_delivery_date: date }
 ```
 
-Em `shipping_in`, informe a data em que a encomenda deverá ser despachada.
+O **retorno** é uma hash como esta abaixo:
 
-E é isso. ;)
+```ruby
+  {
+    freight: 50.00,               # total do frete
+    min_delivery_date: min_date,  # data mínima de entrega
+    max_delivery_date: max_date   # data máxima de entrega
+  }
+```
+
+
+#### 1.4.2 Consulta com retorno completo
+
+É possível também pode realizar uma consulta completa com o método `Jamef::rate`. 
+
+Os parâmetros são idênticos aos da versão simplificada acima, o que muda é o retorno que agora é uma hash originada diretamente da resposta da Jamef.
+
+**Exemplo de retorno:**
 
 ---
 
-### Rastreio (Tracking)
+## 2. Rastreio (Tracking)
 
 Ainda não está pronto.
 
 ---
 
-## Instalação
+## 3. Instalação
 
 Se você estiver usando o Bundler, adiciona esta linha no seu Gemfile
 
@@ -109,20 +142,22 @@ require 'jamef-api'
     
 em cima do documento antes utilizar a Gem.
 
-## Informações Complementares - Jamef
+---
 
-### Tipo de Produto a ser enviado
+## 4. Informações Complementares - Jamef
+
+### 4.1 Tipo de Produto a ser enviado
 
 Você pode especificar o tipo de produto transportado num pacote a partir da tabela abaixo.
 
-##### Para frete rodoviário​
+##### 4.1.1 Para frete rodoviário​
 
 | Ruby symbol | Tipo de produto |
 | -------- | ------- |
 | `:nf` | CONFORME NOTA FISCAL |
 | `:livros` | LIVROS |
 
-##### Para frete aéreo
+##### 4.1.2 Para frete aéreo
 
 | Ruby symbol | Tipo de produto |
 | -------- | ------- |
@@ -136,7 +171,7 @@ Você pode especificar o tipo de produto transportado num pacote a partir da tab
 | `material_escolar` |  MATERIAL ESCOLAR |
 
 
-### Filiais da Jamef
+### 4.2 Filiais da Jamef
 
 Encontre a sua filial e veja o valor do `jamef_branch` que você deve utilizar. Basicamente é o nome da cidade, mas por via das dúvidas:
 
@@ -179,8 +214,9 @@ Encontre a sua filial e veja o valor do `jamef_branch` que você deve utilizar. 
 | `:vitoria_da_conquista` | VDC - Vitória da Conquista - BA |
 | `:vitoria` | VIX - Vitória - ES |
 
+---
 
-## Contribuições
+## 5. Contribuições
 
 Se vir um bug, manda aí.
 
@@ -190,9 +226,10 @@ Pull requests são super bem-vindos e serão aceitos desde que:
 * Incluam testes, 
 * Façam sentido.
 
-
 Tamo junto. :)
 
-## License
+---
+
+## 6. License
 
 [MIT License](https://opensource.org/licenses/MIT).

@@ -3,11 +3,11 @@ require 'active_model'
 
 module Jamef
   
-  class Client < OpenStruct
+  class Sender < OpenStruct
     
     include ActiveModel::Validations
     
-    validates :document, :user, :city, :state, :jamef_branch, presence: true
+    validates :document, :city, :state, :jamef_branch, presence: true
     
     validates :state, length: {is: 2}
     

@@ -1,14 +1,14 @@
 require 'spec_helper'
 
-RSpec.describe Jamef::Client do
+RSpec.describe Jamef::Sender do
   
-  let(:client)  { Jamef::Client.new(document: '000', user: 'Some City', city: 'Some Value', state: 'SP', jamef_branch: :campinas)}
+  let(:client)  { Jamef::Sender.new(document: '000', user: 'Some City', city: 'Some Value', state: 'SP', jamef_branch: :campinas)}
   
   it 'has a valid "factory"' do
     expect(client).to be_valid
   end
   
-  [:document, :user, :city, :state, :jamef_branch].each do |field|
+  [:document, :city, :state, :jamef_branch].each do |field|
     it "is invalid without #{field}" do
       client.send("#{field}=",nil)
       expect(client).not_to be_valid
@@ -29,15 +29,15 @@ RSpec.describe Jamef::Client do
   
   it 'raises an error if not initialized properly (valid)' do
     hash = client.to_h
-    expect(Jamef::Client.new(hash)).to be_valid
+    expect(Jamef::Sender.new(hash)).to be_valid
     expect {
-      Jamef::Client.new
+      Jamef::Sender.new
     }.to raise_error ArgumentError
     expect {
-      Jamef::Client.new(hash.merge(jamef_branch: :unknown_chuck_norris_branch))
+      Jamef::Sender.new(hash.merge(jamef_branch: :unknown_chuck_norris_branch))
     }.to raise_error ArgumentError
     expect {
-      Jamef::Client.new(hash.merge(state: 'Sao Paulo'))
+      Jamef::Sender.new(hash.merge(state: 'Sao Paulo'))
     }.to raise_error ArgumentError
   end
   

@@ -5,133 +5,68 @@ Bundler.require(:pry,:development)
 
 module Jamef
   module Rating
-  
-    # TO-DO: move params logic to Jamef::Rating::Params class.
     
+    WSDL = 'http://www.jamef.com.br/webservice/JAMW0520.apw?WSDL'
+  
     def self.rate params
-      validate_params(params)
-      hash = soap_params(params)
-      response = get(hash)
+      params = Jamef::Params.new(params)
+      response = send_message(params)
       parse_response(response)
     end
     
-    def self.validate_params params
-      raise ArgumentError, "Expected a hash. Got #{params.class}" unless params.is_a?(Hash)
-      [:client,:package,:to,:shipping_in, :service_type].each do |field|
-        raise ArgumentError, "Missing :#{field} key." unless params.has_key?(field) and params[field].present?
-      end
-      raise ArgumentError, ":client is not a Jamef::Client" unless params[:client].is_a?(Jamef::Client)
-
-      raise ArgumentError, ":package is not a Jamef::Package" unless params[:package].is_a?(Jamef::Package)
-      true
+    def self.quick_rate params
+      simplify_parsed_response(rate(params))
     end
     
-    def self.build_url_from_params params
-      [
-        # base
-        Jamef.api_base_url.sub(/\/$/,''),
-        
-        # service type
-        Jamef::Rating.service_map(params[:service_type]),
-        
-        # document
-        params[:client].document.gsub(/\D*/,''),
-        
-        # origin city
-        params[:client].city,
-        
-        # origin state
-        params[:client].state,
-        
-        # products type
-        Jamef::Package.type_map(params[:package].type),
-        
-        # package weight
-        Jamef::Helper.format_decimal(params[:package].weight),
-        
-        # package price
-        Jamef::Helper.format_decimal(params[:package].price),
-        
-        # package volume
-        Jamef::Helper.format_decimal(params[:package].volume),
-        
-        # destination zip
-        Jamef::Helper.format_zip(params[:to]),
-        
-        # jamef branch​
-        Jamef::Branch.find((params[:branch] || params[:jamef_branch]) || params[:client].jamef_branch).code,
-        
-        # shipping_in date
-        params[:shipping_in].strftime("%d/%m/%Y"),
-        
-        # user
-        params[:client].user
-      ].join('/')
-    end
+    private
     
-    def self.soap_params params
-      {  
-        # service type
-        tiptra: Jamef::Rating.service_map(params[:service_type]),
-        
-        # document
-        cnpjcpf: params[:client].document.gsub(/\D*/,''),
-        
-        # origin city
-        munori: params[:client].city,
-        
-        # origin state
-        estori: params[:client].state,
-        
-        # products type
-        segprod: Jamef::Package.type_map(params[:package].type),
-        
-        # 
-        qtdvol: 1,
-        
-        # package weight
-        peso: Jamef::Helper.format_decimal(params[:package].weight),
-        
-        # package price
-        valmer: Jamef::Helper.format_decimal(params[:package].price),
-        
-        # package volume
-        metro3: Jamef::Helper.format_decimal(params[:package].volume),
-        
-        # destination zip
-        cepdes: Jamef::Helper.format_zip(params[:to]),
-        
-        # jamef branch​
-        filcot: Jamef::Branch.find((params[:branch] || params[:jamef_branch]) || params[:client].jamef_branch).code,
-        
-      }
+    def self.wsdl
+      WSDL
     end
-    
-    def self.get hash
-      wsdl = 'http://www.jamef.com.br/webservice/JAMW0520.apw?WSDL'
-      client = Savon.client do |globals|
+        
+    def self.send_message params
+      @client ||= Savon.client do |globals|
         globals.convert_request_keys_to :upcase
         globals.wsdl wsdl
       end
-      binding.pry
-    
-      {"valor": "50.00","previsao_entrega":"31/12/#{Date.today.year}"}.to_json      
+      freight_response = @client.call(:jamw0520_05, message: params.freight_hash)
+      delivery_response = @client.call(:jamw0520_04, message: params.delivery_hash)
+      {freight: freight_response, delivery: delivery_response}
     end
     
-    def self.parse_response response_body
-      h = JSON.parse(response_body)
-      price = Float(h["valor"])
-      estimated_delivery_date = Date.strptime(h['previsao_entrega'], '%d/%m/%Y')
-      {price: price, estimated_delivery_date: estimated_delivery_date }
+    def self.parse_response response
+      {freight: parse_freight_response(response), delivery: parse_delivery_response(response)}
     end
     
-    def self.service_map service
-      value = {
-        road: 1,
-        air: 2
-      }[service.to_sym]
-      value ? value : raise(ArgumentError, "Jamef #{service} service not found")
+    def self.parse_freight_response response
+      response[:freight].body.to_h[:jamw0520_05_response][:jamw0520_05_result]
     end
+    
+    def self.parse_delivery_response response
+      response[:delivery].body.to_h[:jamw0520_04_response][:jamw0520_04_result]
+    end
+    
+    
+    def self.simplify_parsed_response parsed_response
+      if successful_response?(parsed_response)
+        freight = Jamef::Helper.parse_decimal(parsed_response[:freight][:valfre][:avalfre].last[:total])
+        min_date = Jamef::Helper.parse_date(parsed_response[:delivery][:cdtmin])
+        max_date = Jamef::Helper.parse_date(parsed_response[:delivery][:cdtmax])
+        {
+          freight: freight,
+          min_delivery_date: min_date,
+          max_delivery_date: max_date 
+        }
+      else
+        binding.pry
+        { error: (parsed_response[:freight][:msgerro] || parsed_response[:delivery][:msgerro]) }
+      end
+    end
+    
+    def self.successful_response? parsed_response
+      parsed_response[:freight][:msgerro].match?(/^OK/i) and  parsed_response[:delivery][:msgerro].match?(/^OK/i)
+    end
+    
     
   end
 end
