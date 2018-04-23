@@ -1,6 +1,6 @@
-# Jamef REST API (v1)
+# Jamef API (v1)
 
-Olá. Essa gem é um Ruby wrapper da API REST (v1) da *Jamef.com.br*. Use-a em qualquer projeto Ruby/Rails.
+Olá. Essa gem é um Ruby wrapper da API SOAP (v1) da *Jamef.com.br*. Use-a em qualquer projeto Ruby/Rails.
 
 Você poderá facilmente
 
