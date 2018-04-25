@@ -15,8 +15,8 @@ module Jamef
     Jamef::Rating.rate(params)
   end
   
-  def self.quick_rate params
-    Jamef::Rating.quick_rate(params)
+  def self.complete_rate params
+    Jamef::Rating.complete_rate(params)
   end
   
   def self.track params

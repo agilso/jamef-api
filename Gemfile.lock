@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    jamef-api (0.1.0)
+    jamef-api (0.5.0)
       activemodel
       activesupport
       rest-client

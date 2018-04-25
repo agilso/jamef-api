@@ -9,8 +9,8 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Agilso"]
   spec.email         = ["agilso.b@gmail.com"]
 
-  spec.summary       = %q{Jamef REST API v1}
-  spec.description   = %q{Ruby wrapper for the Jamef.com.br Rest API (v1).}
+  spec.summary       = %q{Ruby wrapper for the Jamef API}
+  spec.description   = %q{Ruby wrapper for the Jamef.com.br SOAP API.}
   spec.homepage      = "https://github.com/agilso/jamef-api"
   spec.license       = "MIT"
 

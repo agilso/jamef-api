@@ -1,22 +1,20 @@
-# Jamef API (v1)
+# Jamef API
 
-Olá. Essa gem é um Ruby wrapper da API SOAP (v1) da *Jamef.com.br*. Use-a em qualquer projeto Ruby/Rails.
+Olá. Essa gem é um Ruby wrapper da API SOAP da *Jamef.com.br*. Use-a em qualquer projeto Ruby/Rails.
 
 Você poderá facilmente
 
 * **Consultar** frete e prazo de entrega
-* **Rastrear** encomendas despachadas **( ! )**
+* ~~Rastrear encomendas despachadas~~ (#TO DO)
 
-**( ! )** Neste momento, somente a consulta está disponível. A funcionalidade do rastreio (tracking) não deve demorar para ser implementada. Colaborações são bem-vindas, mande o pull-request. ;)
+## 1. Consulta de Frete e Prazo (Rating)
 
-## 1. Consultando o Frete (Rating)
-
-Realizar uma consulta de frete e prazo é bastante simples. São apenas 4 passos, veja uma resumo do processo:
+Após a instalação da gem, realizar uma consulta de frete é bastante simples. São apenas 4 passos, veja uma resumo do processo:
 
 1. Defina o **remetente** com `Jamef::Sender`
 2. Defina o **destinatário** com `Jamef::Receiver`
 3. Defina **a mercadoria que vai ser enviada** com `Jamef::Package`
-4. Realize a **consulta** com `Jamef.quick_rate` ou `Jamef.rate`
+4. Realize a **consulta** com `Jamef.rate` ou `Jamef.complete_rate`
 
 
 
@@ -37,7 +35,7 @@ my_company = Jamef::Sender.new({
 
 * `jamef_branch` é sempre o nome da cidade da filial da Jamef associada à sua conta. Veja a tabela no final do documento.
 
-### 1.2 - Destinário
+### 1.2 - Destinatário
 
 Crie um destinatário com o `Jamef::Receiver`.
 
@@ -68,16 +66,16 @@ Você pode omitir `type: :nf` que é o valor padrão. O tipo `:nf` diz à Jamef 
 
 ### 1.4 - Consulta
 
-Há dois métodos que você pode usar para fazer a consulta: `Jamef.rate` e `Jamef.quick_rate`. Escolha a maneira mais adequada.
+Há dois métodos que você pode usar para fazer a consulta: `Jamef.complete_rate` e `Jamef.rate`. Escolha a maneira mais adequada.
 
 #### 1.4.1 Consulta com retorno simplificado
 
-Você pode realizar uma consulta simples com o `Jamef::quick_rate`
+Você pode realizar uma consulta simples com o `Jamef::rate`
 
 Em `shipping_in`, informe a data/horário (datetime) de coleta da encomenda.
 
 ```ruby
-Jamef.quick_rate({
+Jamef.rate({
   sender: my_company, 
   receiver: receiver, 
   package: package, 
@@ -104,11 +102,29 @@ O **retorno** é uma hash como esta abaixo:
 
 #### 1.4.2 Consulta com retorno completo
 
-É possível também pode realizar uma consulta completa com o método `Jamef::rate`. 
+É possível também pode realizar uma consulta completa com o método `Jamef.complete_rate`. 
 
 Os parâmetros são idênticos aos da versão simplificada acima, o que muda é o retorno que agora é uma hash originada diretamente da resposta da Jamef.
 
 **Exemplo de retorno:**
+
+```ruby
+{:freight=>
+  {:msgerro=>"Ok - Calculo executado na filial [ CPQ ] cFilAnt : [03] Cliente Destinatario [  ] ",
+   :valfre=>
+    {:avalfre=>
+      [{:componente=>"[01]-Pedagio             ", :imposto=>"0.58634409", :total=>"8.37634409", :valor=>"7.79000000"},
+       {:componente=>"[03]-GRIS                ", :imposto=>"0.17583323", :total=>"2.51190323", :valor=>"2.33607000"},
+       {:componente=>"[04]-TAS                 ", :imposto=>"0.49000000", :total=>"7.00000000", :valor=>"6.51000000"},
+       {:componente=>"[05]-Taxa (ate 100kg)    ", :imposto=>"0.00000000", :total=>"0.00000000", :valor=>"0.00000000"},
+       {:componente=>"[06]-Frete Peso (FM)     ", :imposto=>"13.81830288", :total=>"197.40432688", :valor=>"183.58602400"},
+       {:componente=>"[07]-Frete Valor         ", :imposto=>"0.55680522", :total=>"7.95436022", :valor=>"7.39755500"},
+       {:componente=>"[10]-TRT                 ", :imposto=>"0.00000000", :total=>"0.00000000", :valor=>"0.00000000"},
+       {:componente=>"[23]-Frete Peso (FP)     ", :imposto=>"0.00000000", :total=>"0.00000000", :valor=>"0.00000000"},
+       {:componente=>"[24]-Taxa (acima 100kg)  ", :imposto=>"0.00000000", :total=>"0.00000000", :valor=>"0.00000000"},
+       {:componente=>"TF-TOTAL DO FRETE", :imposto=>"15.63000000", :total=>"223.25000000", :valor=>"207.62000000"}]}},
+ :delivery=>{:cdtmax=>"03/05/18", :cdtmin=>"02/05/18", :msgerro=>"OK"}}
+```
 
 ---
 

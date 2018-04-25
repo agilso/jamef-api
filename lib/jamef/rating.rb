@@ -1,5 +1,5 @@
+require 'savon'
 require 'date'
-require 'rest-client'
 require_relative './rating/params'
 Bundler.require(:pry,:development)
 
@@ -8,29 +8,34 @@ module Jamef
     
     WSDL = 'http://www.jamef.com.br/webservice/JAMW0520.apw?WSDL'
   
-    def self.rate params
+    def self.complete_rate params
       params = Jamef::Params.new(params)
       response = send_message(params)
       parse_response(response)
     end
     
-    def self.quick_rate params
-      simplify_parsed_response(rate(params))
+    def self.rate params
+      simplify_parsed_response(complete_rate(params))
+    end
+    
+    def self.savon_client
+      @savon_client ||= ::Savon.client do |globals|
+        globals.convert_request_keys_to :upcase
+        globals.wsdl wsdl
+      end
+      @savon_client
     end
     
     private
+    
     
     def self.wsdl
       WSDL
     end
         
     def self.send_message params
-      @client ||= Savon.client do |globals|
-        globals.convert_request_keys_to :upcase
-        globals.wsdl wsdl
-      end
-      freight_response = @client.call(:jamw0520_05, message: params.freight_hash)
-      delivery_response = @client.call(:jamw0520_04, message: params.delivery_hash)
+      freight_response = savon_client.call(:jamw0520_05, message: params.freight_hash)
+      delivery_response = savon_client.call(:jamw0520_04, message: params.delivery_hash)
       {freight: freight_response, delivery: delivery_response}
     end
     
@@ -53,18 +58,23 @@ module Jamef
         min_date = Jamef::Helper.parse_date(parsed_response[:delivery][:cdtmin])
         max_date = Jamef::Helper.parse_date(parsed_response[:delivery][:cdtmax])
         {
+          success: true,
+          error: false,
           freight: freight,
           min_delivery_date: min_date,
           max_delivery_date: max_date 
         }
       else
-        binding.pry
-        { error: (parsed_response[:freight][:msgerro] || parsed_response[:delivery][:msgerro]) }
+        { error: get_error(parsed_response), success: false }
       end
     end
     
     def self.successful_response? parsed_response
       parsed_response[:freight][:msgerro].match?(/^ok/i) and  parsed_response[:delivery][:msgerro].match?(/^ok/i)
+    end
+    
+    def self.get_error parsed_response
+      parsed_response[:freight][:msgerro].match?(/^ok/i) ? parsed_response[:delivery][:msgerro] : parsed_response[:freight][:msgerro]
     end
     
     

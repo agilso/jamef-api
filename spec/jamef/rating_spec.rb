@@ -7,62 +7,39 @@ fake_response = OpenStruct.new(body: {"valor": "50.00","previsao_entrega":"31/12
 
 RSpec.describe Jamef::Rating do
   
-  let(:client) {
+  let!(:sender) {
     Jamef::Sender.new({
       document: '000.000.000-00',
-      city: 'Test City',
-      state: 'XX',
+      city: 'Jundiaí',
+      state: 'xx',
       jamef_branch: :campinas
     })
   }
   
-  let(:package) {
+  let!(:package) {
     Jamef::Package.new({
       weight: 5,
       package_price: 1000,
-      volume: 5
+      volume: 2
     })
   }
   
-  let(:valid_params) {
-    { client: client, package: package, to: '07060-000', shipping_in: 3.days.from_now, service_type: :road }
+  let!(:receiver) {
+    Jamef::Receiver.new({
+      zip: '07060-000'
+    })
   }
-  # 
-  # context 'service map' do
-  # 
-  # end
-
   
-  # context 'soap' do
-  #   before(:each) {
-  #     allow(Jamef::Rating).to receive(:build_url_from_params).and_return(fake_url)
-  # 
-  #     allow(RestClient).to receive(:get).with(fake_url).and_return(fake_response)
-  #   }
-  # 
-  # 
-  #   it 'url is stubbed correctly' do
-  #     expect(Jamef::Rating.build_url_from_params('lol')).to eq 'http://testing.jamef.request'
-  #   end
-  # 
-  #   context 'rate' do
-  #     it 'makes a http request to the jamef api' do
-  #       expect(RestClient).to receive(:get).with(fake_url)
-  #       Jamef::Rating.rate(valid_params)
-  #     end
-  # 
-  #     context 'success' do
-  #       it 'returns a hash' do
-  #         expect(Jamef::Rating.rate(valid_params)).to eq( {price: 50.00, estimated_delivery_date: Date.today.end_of_year })
-  #       end
-  #     end
-  # 
-  #     context 'parsing' do
-  # 
-  #     end
-  # 
-  #   end
+  let!(:rate_hash_params) {
+    { sender: sender, package: package, receiver: receiver, shipping_in: Date.new(2030,07,20).midday, service_type: :road }
+  }
+  
+  it 'sends correct messages to Jamef soap api through Savon' do
+    expect(Jamef::Rating.instance_eval{ savon_client }).to receive(:call).once.with(:jamw0520_05, { message: Jamef::Params.new(rate_hash_params).freight_hash } )
     
-  # end
+    expect(Jamef::Rating.instance_eval{ savon_client }).to receive(:call).once.with(:jamw0520_04, { message: Jamef::Params.new(rate_hash_params).delivery_hash } )
+    begin Jamef.rate(rate_hash_params) rescue nil end
+  end
+  
   
 end
