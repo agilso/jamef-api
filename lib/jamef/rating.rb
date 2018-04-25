@@ -1,7 +1,7 @@
 require 'savon'
 require 'date'
 require_relative './rating/params'
-Bundler.require(:pry,:development)
+# Bundler.require(:pry,:development)
 
 module Jamef
   module Rating
