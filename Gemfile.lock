@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    jamef-api (0.5.1)
+    jamef-api (0.5.2)
       activemodel
       activesupport
       savon (~> 2.0)
