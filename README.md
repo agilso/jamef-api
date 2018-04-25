@@ -9,7 +9,7 @@ Você poderá facilmente
 
 ## 1. Consulta de Frete e Prazo (Rating)
 
-Após a instalação da gem, realizar uma consulta de frete é bastante simples. São apenas 4 passos, veja uma resumo do processo:
+Após a instalação da gem, realizar uma consulta de frete é bastante simples. São apenas 4 passos, veja um resumo do processo:
 
 1. Defina o **remetente** com `Jamef::Sender`
 2. Defina o **destinatário** com `Jamef::Receiver`
@@ -153,7 +153,7 @@ Ou instale diretamente no Ruby com
 Neste caso, quando for utilizar, não esqueça de dar um
 
 ```ruby
-require 'jamef-api'
+require 'jamef'
 ```
     
 em cima do documento antes utilizar a Gem.
