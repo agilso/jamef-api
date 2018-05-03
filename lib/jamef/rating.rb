@@ -70,11 +70,11 @@ module Jamef
     end
     
     def self.successful_response? parsed_response
-      parsed_response[:freight][:msgerro].match?(/^ok/i) and  parsed_response[:delivery][:msgerro].match?(/^ok/i)
+      parsed_response[:freight][:msgerro] =~ (/^ok/i) and  parsed_response[:delivery][:msgerro] =~ (/^ok/i)
     end
     
     def self.get_error parsed_response
-      parsed_response[:freight][:msgerro].match?(/^ok/i) ? parsed_response[:delivery][:msgerro] : parsed_response[:freight][:msgerro]
+      parsed_response[:freight][:msgerro] =~ (/^ok/i) ? parsed_response[:delivery][:msgerro] : parsed_response[:freight][:msgerro]
     end
     
     
