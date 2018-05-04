@@ -69,6 +69,10 @@ module Jamef
       value.strftime("%H:%M")
     end
     
+    def self.format_boolean value
+      value ? 'S' : 'N'
+    end
+    
     def self.parse_date value
       Date.strptime(value, '%d/%m/%y')
     end
