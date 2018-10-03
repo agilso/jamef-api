@@ -6,6 +6,10 @@ require_relative './rating/params'
 module Jamef
   module Rating
     
+    def self.custom_wsdl= wsdl
+      @custom_wsdl = wsdl
+    end
+    
     WSDL = 'https://www.jamef.com.br/webservice/JAMW0520.apw?WSDL'
   
     def self.complete_rate params
@@ -21,7 +25,10 @@ module Jamef
     def self.savon_client
       @savon_client ||= ::Savon.client do |globals|
         globals.convert_request_keys_to :upcase
+        globals.headers({ 'X-Forwarded-Scheme' => 'https'})
         globals.wsdl wsdl
+        globals.follow_redirects true
+        globals.ssl_version :TLSv1_2
       end
       @savon_client
     end
@@ -30,7 +37,7 @@ module Jamef
     
     
     def self.wsdl
-      WSDL
+      @custom_wsdl || WSDL
     end
         
     def self.send_message params
