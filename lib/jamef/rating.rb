@@ -6,7 +6,7 @@ require_relative './rating/params'
 module Jamef
   module Rating
     
-    WSDL = 'http://www.jamef.com.br/webservice/JAMW0520.apw?WSDL'
+    WSDL = 'https://www.jamef.com.br/webservice/JAMW0520.apw?WSDL'
   
     def self.complete_rate params
       params = Jamef::Params.new(params)
